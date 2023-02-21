@@ -143,6 +143,7 @@ class _DetectableTextState extends State<DetectableText> {
           source: widget.text,
           detectionRegExp: widget.detectionRegExp,
           alwaysDetectTap: widget.alwaysDetectTap,
+          acceptedDetections: [],
         );
 
         // Layout and measure link
@@ -211,7 +212,7 @@ class _DetectableTextState extends State<DetectableText> {
                     (linkLongerThanLine ? _kLineSeparator : '')
                     : widget.text,
                 detectionRegExp: widget.detectionRegExp,
-                children: <TextSpan>[_delimiter, link],
+                children: <TextSpan>[_delimiter, link],                acceptedDetections: [],
               );
             } else {
               textSpan =  getDetectedTextSpan(
@@ -221,6 +222,7 @@ class _DetectableTextState extends State<DetectableText> {
                 source: widget.text,
                 alwaysDetectTap: widget.alwaysDetectTap,
                 detectionRegExp: widget.detectionRegExp,
+                acceptedDetections: [],
               );
             }
             break;
@@ -245,6 +247,7 @@ class _DetectableTextState extends State<DetectableText> {
                     : widget.text,
                 detectionRegExp: widget.detectionRegExp,
                 children: <TextSpan>[_delimiter, link],
+                acceptedDetections: [],
               );
             } else {
               textSpan =  getDetectedTextSpan(
@@ -253,6 +256,7 @@ class _DetectableTextState extends State<DetectableText> {
                 onTap: widget.onTap,
                 source: widget.text,
                 detectionRegExp: widget.detectionRegExp,
+                acceptedDetections: [],
               );
             }
 

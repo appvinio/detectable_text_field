@@ -20,6 +20,7 @@ class DetectableEditableText extends EditableText {
     required Color cursorColor,
     required this.onDetectionTyped,
     required this.onDetectionFinished,
+    required this. acceptedDetections,
     ValueChanged<String>? onChanged,
     ValueChanged<String>? onSubmitted,
     int? maxLines,
@@ -145,6 +146,8 @@ class DetectableEditableText extends EditableText {
 
   final VoidCallback? onDetectionFinished;
 
+  final List<String>? acceptedDetections;
+
   @override
   DetectableEditableTextState createState() => DetectableEditableTextState();
 }
@@ -174,7 +177,7 @@ class DetectableEditableTextState extends EditableTextState {
   }
 
   void _onValueUpdated() {
-    final detections = detector.getDetections(textEditingValue.text);
+    final detections = detector.getDetections(textEditingValue.text,widget.acceptedDetections, textEditingValue.selection);
     final composer = Composer(
       selection: textEditingValue.selection.start,
       onDetectionTyped: widget.onDetectionTyped,
@@ -200,7 +203,7 @@ class DetectableEditableTextState extends EditableTextState {
 
   @override
   TextSpan buildTextSpan() {
-    final detections = detector.getDetections(textEditingValue.text);
+    final detections = detector.getDetections(textEditingValue.text, widget.acceptedDetections, textEditingValue.selection);
     final composer = Composer(
       selection: textEditingValue.selection.start,
       onDetectionTyped: widget.onDetectionTyped,

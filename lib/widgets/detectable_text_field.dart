@@ -328,6 +328,7 @@ class DetectableTextField extends StatefulWidget {
   const DetectableTextField({
     Key? key,
     required this.detectionRegExp,
+    this.acceptedDetections,
     this.decoratedStyle,
     this.onDetectionFinished,
     this.onDetectionTyped,
@@ -430,6 +431,8 @@ class DetectableTextField extends StatefulWidget {
                     paste: true,
                   )),
         super(key: key);
+
+  final List<String>? acceptedDetections;
 
   final ValueChanged<String>? onDetectionTyped;
 
@@ -1277,6 +1280,7 @@ class _DetectableTextFieldState extends State<DetectableTextField>
       child: UnmanagedRestorationScope(
         bucket: bucket,
         child: DetectableEditableText(
+          acceptedDetections: widget.acceptedDetections,
           key: editableTextKey,
           detectionRegExp: widget.detectionRegExp,
           detectedStyle:
@@ -1338,6 +1342,7 @@ class _DetectableTextFieldState extends State<DetectableTextField>
           autofillHints: widget.autofillHints,
           autocorrectionTextRectColor: autocorrectionTextRectColor,
           restorationId: 'editable',
+
         ),
       ),
     );

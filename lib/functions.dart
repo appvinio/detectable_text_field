@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'detector/detector.dart';
 
 /// Check if the text has detection
-bool isDetected(String value, RegExp detectionRegExp) {
+bool isDetected(String value, RegExp detectionRegExp, List<String>? acceptedDetections, bool isInProgress) {
   final decoratedTextColor = Colors.blue;
   final detector = Detector(
     textStyle: TextStyle(),
@@ -13,7 +13,7 @@ bool isDetected(String value, RegExp detectionRegExp) {
     ),
     detectionRegExp: detectionRegExp,
   );
-  final result = detector.getDetections(value);
+  final result = detector.getDetections(value, acceptedDetections, null);
   final detections = result
       .where((detection) => detection.style!.color == decoratedTextColor)
       .toList();
@@ -21,14 +21,14 @@ bool isDetected(String value, RegExp detectionRegExp) {
 }
 
 /// Extract detections from the text
-List<String> extractDetections(String value, RegExp detectionRegExp) {
+List<String> extractDetections(String value, RegExp detectionRegExp, List<String>? acceptedDetections, bool isInProgress) {
   final decoratedTextColor = Colors.blue;
   final decorator = Detector(
     textStyle: TextStyle(),
     detectedStyle: TextStyle(color: decoratedTextColor),
     detectionRegExp: detectionRegExp,
   );
-  final decorations = decorator.getDetections(value);
+  final decorations = decorator.getDetections(value, acceptedDetections, null );
   final taggedDecorations = decorations
       .where((decoration) => decoration.style!.color == decoratedTextColor)
       .toList();
@@ -50,12 +50,13 @@ TextSpan getDetectedTextSpan({
   bool alwaysDetectTap = false,
   Function(String)? onTap,
   bool decorateAtSign = false,
+  required List<String>? acceptedDetections,
 }) {
   final detections = Detector(
     detectedStyle: decoratedStyle,
     textStyle: basicStyle,
     detectionRegExp: detectionRegExp,
-  ).getDetections(source);
+  ).getDetections(source, acceptedDetections,  null );
   if (detections.isEmpty) {
     return TextSpan(text: source, style: basicStyle);
   } else {
@@ -96,12 +97,14 @@ TextSpan getDetectedTextSpanWithExtraChild(
     Function(String)? onTap,
     bool decorateAtSign = false,
       bool alwaysDetectTap = false,
-    List<InlineSpan>? children}) {
+    List<InlineSpan>? children,
+    required  List<String>? acceptedDetections,
+    }) {
   final detections = Detector(
     detectedStyle: decoratedStyle,
     textStyle: basicStyle,
     detectionRegExp: detectionRegExp,
-  ).getDetections(source);
+  ).getDetections(source,acceptedDetections, null);
   if (detections.isEmpty) {
     // return TextSpan(text: source, style: basicStyle);
     return TextSpan(

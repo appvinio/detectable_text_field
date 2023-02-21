@@ -29,10 +29,17 @@ class Detector {
   });
 
   List<Detection> _getSourceDetections(
-      List<RegExpMatch> tags, String copiedText) {
+        List<RegExpMatch> tags,
+        String copiedText,
+        List<String>? acceptedDetections,
+        RegExp detectionRegex,
+        TextSelection? selection,
+      ) {
     TextRange? previousItem;
     final result = <Detection>[];
+
     for (var tag in tags) {
+      print(tag.start);
       ///Add undetected content
       if (previousItem == null) {
         if (tag.start > 0) {
@@ -45,11 +52,43 @@ class Detector {
             style: textStyle));
       }
 
-      ///Add detected content
-      result.add(Detection(
-          range: TextRange(start: tag.start, end: tag.end),
-          style: detectedStyle));
-      previousItem = TextRange(start: tag.start, end: tag.end);
+      if(acceptedDetections?.isNotEmpty ?? false){
+        if(acceptedDetections!.contains(copiedText.substring(tag.start, tag.end))){
+          ///Add detected content
+          result.add(Detection(
+              range: TextRange(start: tag.start, end: tag.end),
+              style: detectedStyle));
+          previousItem = TextRange(start: tag.start, end: tag.end);
+        }else{
+          if(selection != null){
+            if(selection.baseOffset>=tag.start && selection.baseOffset<=tag.end){
+              result.add(Detection(
+                  range: TextRange(start: tag.start, end: tag.end),
+                  style: detectedStyle));
+              previousItem = TextRange(start: tag.start, end: tag.end);
+            }else{
+              result.add(Detection(
+                  range: TextRange(start: tag.start, end: tag.end),
+                  style: textStyle));
+              previousItem = TextRange(start: tag.start, end: tag.end);
+            }
+          }
+        }
+      }else{
+            if(selection != null) {
+              if (selection.baseOffset >= tag.start && selection.baseOffset <= tag.end) {
+                result.add(Detection(
+                    range: TextRange(start: tag.start, end: tag.end),
+                    style: detectedStyle));
+                previousItem = TextRange(start: tag.start, end: tag.end);
+              } else {
+                result.add(Detection(
+                    range: TextRange(start: tag.start, end: tag.end),
+                    style: textStyle));
+                previousItem = TextRange(start: tag.start, end: tag.end);
+              }
+            }
+      }
     }
 
     ///Add remaining undetected content
@@ -59,6 +98,7 @@ class Detector {
               TextRange(start: result.last.range.end, end: copiedText.length),
           style: textStyle));
     }
+
     return result;
   }
 
@@ -98,7 +138,7 @@ class Detector {
   }
 
   /// Return the list of decorations with tagged and untagged text
-  List<Detection> getDetections(String copiedText) {
+  List<Detection> getDetections(String copiedText, List<String>? acceptedDetections, TextSelection? selection) {
     /// Text to change emoji into replacement text
     final fullWidthRegExp = RegExp(
         r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])');
@@ -121,16 +161,18 @@ class Detector {
     });
 
     final tags = detectionRegExp.allMatches(copiedText).toList();
+
     if (tags.isEmpty) {
       return [];
     }
 
-    final sourceDetections = _getSourceDetections(tags, copiedText);
+    final sourceDetections = _getSourceDetections(tags, copiedText, acceptedDetections, detectionRegExp, selection);
 
     final emojiFilteredResult = _getEmojiFilteredDetections(
         copiedText: copiedText,
         emojiMatches: emojiMatches,
-        source: sourceDetections);
+        source: sourceDetections,
+    );
 
     return emojiFilteredResult;
   }
