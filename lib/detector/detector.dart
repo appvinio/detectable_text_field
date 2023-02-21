@@ -29,12 +29,12 @@ class Detector {
   });
 
   List<Detection> _getSourceDetections(
-        List<RegExpMatch> tags,
-        String copiedText,
-        List<String>? acceptedDetections,
-        RegExp detectionRegex,
-        TextSelection? selection,
-      ) {
+    List<RegExpMatch> tags,
+    String copiedText,
+    List<String>? acceptedDetections,
+    RegExp detectionRegex,
+    TextSelection? selection,
+  ) {
     TextRange? previousItem;
     final result = <Detection>[];
 
@@ -42,59 +42,51 @@ class Detector {
       ///Add undetected content
       if (previousItem == null) {
         if (tag.start > 0) {
-          result.add(Detection(
-              range: TextRange(start: 0, end: tag.start), style: textStyle));
+          result.add(Detection(range: TextRange(start: 0, end: tag.start), style: textStyle));
         }
       } else {
-        result.add(Detection(
-            range: TextRange(start: previousItem.end, end: tag.start),
-            style: textStyle));
+        result.add(
+            Detection(range: TextRange(start: previousItem.end, end: tag.start), style: textStyle));
       }
 
-      if(acceptedDetections?.isNotEmpty ?? false){
-        if(acceptedDetections!.contains(copiedText.substring(tag.start, tag.end))){
+      if (acceptedDetections?.isNotEmpty ?? false) {
+        if (acceptedDetections!.contains(copiedText.substring(tag.start, tag.end))) {
           ///Add detected content
-          result.add(Detection(
-              range: TextRange(start: tag.start, end: tag.end),
-              style: detectedStyle));
+          result.add(
+              Detection(range: TextRange(start: tag.start, end: tag.end), style: detectedStyle));
           previousItem = TextRange(start: tag.start, end: tag.end);
-        }else{
-          if(selection != null){
-            if(selection.baseOffset>=tag.start && selection.baseOffset<=tag.end){
+        } else {
+          if (selection != null) {
+            if (selection.baseOffset >= tag.start && selection.baseOffset <= tag.end) {
               result.add(Detection(
-                  range: TextRange(start: tag.start, end: tag.end),
-                  style: detectedStyle));
+                  range: TextRange(start: tag.start, end: tag.end), style: detectedStyle));
               previousItem = TextRange(start: tag.start, end: tag.end);
-            }else{
-              result.add(Detection(
-                  range: TextRange(start: tag.start, end: tag.end),
-                  style: textStyle));
+            } else {
+              result.add(
+                  Detection(range: TextRange(start: tag.start, end: tag.end), style: textStyle));
               previousItem = TextRange(start: tag.start, end: tag.end);
             }
           }
         }
-      }else{
-            if(selection != null) {
-              if (selection.baseOffset >= tag.start && selection.baseOffset <= tag.end) {
-                result.add(Detection(
-                    range: TextRange(start: tag.start, end: tag.end),
-                    style: detectedStyle));
-                previousItem = TextRange(start: tag.start, end: tag.end);
-              } else {
-                result.add(Detection(
-                    range: TextRange(start: tag.start, end: tag.end),
-                    style: textStyle));
-                previousItem = TextRange(start: tag.start, end: tag.end);
-              }
-            }
+      } else {
+        if (selection != null) {
+          if (selection.baseOffset >= tag.start && selection.baseOffset <= tag.end) {
+            result.add(
+                Detection(range: TextRange(start: tag.start, end: tag.end), style: detectedStyle));
+            previousItem = TextRange(start: tag.start, end: tag.end);
+          } else {
+            result
+                .add(Detection(range: TextRange(start: tag.start, end: tag.end), style: textStyle));
+            previousItem = TextRange(start: tag.start, end: tag.end);
+          }
+        }
       }
     }
 
     ///Add remaining undetected content
     if (result.last.range.end < copiedText.length) {
       result.add(Detection(
-          range:
-              TextRange(start: result.last.range.end, end: copiedText.length),
+          range: TextRange(start: result.last.range.end, end: copiedText.length),
           style: textStyle));
     }
 
@@ -103,21 +95,17 @@ class Detector {
 
   ///filter out the ones includes emoji.
   List<Detection> _getEmojiFilteredDetections(
-      {required List<Detection> source,
-      String? copiedText,
-      List<RegExpMatch>? emojiMatches}) {
+      {required List<Detection> source, String? copiedText, List<RegExpMatch>? emojiMatches}) {
     final result = <Detection>[];
     for (var item in source) {
       int? emojiStartPoint;
       for (var emojiMatch in emojiMatches!) {
-        final decorationContainsEmoji = (item.range.start < emojiMatch.start &&
-            emojiMatch.end <= item.range.end);
+        final decorationContainsEmoji =
+            (item.range.start < emojiMatch.start && emojiMatch.end <= item.range.end);
         if (decorationContainsEmoji) {
           /// If the current Emoji's range.start is the smallest in the tag, update emojiStartPoint
           emojiStartPoint = (emojiStartPoint != null)
-              ? ((emojiMatch.start < emojiStartPoint)
-                  ? emojiMatch.start
-                  : emojiStartPoint)
+              ? ((emojiMatch.start < emojiStartPoint) ? emojiMatch.start : emojiStartPoint)
               : emojiMatch.start;
         }
       }
@@ -127,8 +115,7 @@ class Detector {
           style: detectedStyle,
         ));
         result.add(Detection(
-            range: TextRange(start: emojiStartPoint, end: item.range.end),
-            style: textStyle));
+            range: TextRange(start: emojiStartPoint, end: item.range.end), style: textStyle));
       } else {
         result.add(item);
       }
@@ -137,26 +124,23 @@ class Detector {
   }
 
   /// Return the list of decorations with tagged and untagged text
-  List<Detection> getDetections(String copiedText, List<String>? acceptedDetections, TextSelection? selection) {
+  List<Detection> getDetections(
+      String copiedText, List<String>? acceptedDetections, TextSelection? selection) {
     /// Text to change emoji into replacement text
     final fullWidthRegExp = RegExp(
-        r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])');
+        r'(u0022|u0027|\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])');
 
-    final fullWidthRegExpMatches =
-        fullWidthRegExp.allMatches(copiedText).toList();
-    final tokenRegExp =
-        RegExp(r'[・ぁ-んーァ-ヶ一-龥\u1100-\u11FF\uAC00-\uD7A3０-９ａ-ｚＡ-Ｚ　]');
+    final fullWidthRegExpMatches = fullWidthRegExp.allMatches(copiedText).toList();
+    final tokenRegExp = RegExp(r'[ぁ-んーァ-ヶ一-龥\u1100-\u11FF\uAC00-\uD7A3０-９ａ-ｚＡ-Ｚ　]');
     final emojiMatches = fullWidthRegExpMatches
-        .where((match) => (!tokenRegExp
-            .hasMatch(copiedText.substring(match.start, match.end))))
+        .where((match) => (!tokenRegExp.hasMatch(copiedText.substring(match.start, match.end))))
         .toList();
 
     /// This is to avoid the error caused by 'regExp' which counts the emoji's length 1.
     emojiMatches.forEach((emojiMatch) {
       final emojiLength = emojiMatch.group(0)!.length;
       final replacementText = "a" * emojiLength;
-      copiedText = copiedText.replaceRange(
-          emojiMatch.start, emojiMatch.end, replacementText);
+      copiedText = copiedText.replaceRange(emojiMatch.start, emojiMatch.end, replacementText);
     });
 
     final tags = detectionRegExp.allMatches(copiedText).toList();
@@ -165,12 +149,13 @@ class Detector {
       return [];
     }
 
-    final sourceDetections = _getSourceDetections(tags, copiedText, acceptedDetections, detectionRegExp, selection);
+    final sourceDetections =
+        _getSourceDetections(tags, copiedText, acceptedDetections, detectionRegExp, selection);
 
     final emojiFilteredResult = _getEmojiFilteredDetections(
-        copiedText: copiedText,
-        emojiMatches: emojiMatches,
-        source: sourceDetections,
+      copiedText: copiedText,
+      emojiMatches: emojiMatches,
+      source: sourceDetections,
     );
 
     return emojiFilteredResult;

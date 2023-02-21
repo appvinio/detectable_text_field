@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-   MyHomePage({Key? key}) : super(key: key);
+  MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -48,13 +48,10 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               DetectableTextField(
                 maxLines: null,
+                smartQuotesType: SmartQuotesType.disabled,
                 detectionRegExp: RegExp('@[^,.!?;: ]{0,}'),
-                onDetectionTyped: (text) {
-                  print(text);
-                },
-                onDetectionFinished: () {
-                  print('finished');
-                },
+                onDetectionTyped: (text) {},
+                onDetectionFinished: () {},
               ),
             ],
           ),
