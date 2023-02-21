@@ -39,7 +39,6 @@ class Detector {
     final result = <Detection>[];
 
     for (var tag in tags) {
-      print(tag.start);
       ///Add undetected content
       if (previousItem == null) {
         if (tag.start > 0) {
