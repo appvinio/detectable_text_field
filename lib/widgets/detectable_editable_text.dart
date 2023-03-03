@@ -20,7 +20,9 @@ class DetectableEditableText extends EditableText {
     required Color cursorColor,
     required this.onDetectionTyped,
     required this.onDetectionFinished,
-    required this. acceptedDetections,
+    required this.acceptedDetections,
+    required this.fullWidthRegexp,
+    required this.tokenRegexp,
     ValueChanged<String>? onChanged,
     ValueChanged<String>? onSubmitted,
     int? maxLines,
@@ -148,6 +150,10 @@ class DetectableEditableText extends EditableText {
 
   final List<String>? acceptedDetections;
 
+  final RegExp? fullWidthRegexp;
+
+  final RegExp? tokenRegexp;
+
   @override
   DetectableEditableTextState createState() => DetectableEditableTextState();
 }
@@ -177,7 +183,13 @@ class DetectableEditableTextState extends EditableTextState {
   }
 
   void _onValueUpdated() {
-    final detections = detector.getDetections(textEditingValue.text,widget.acceptedDetections, textEditingValue.selection);
+    final detections = detector.getDetections(
+      copiedText: textEditingValue.text,
+      acceptedDetections: widget.acceptedDetections,
+      selection: textEditingValue.selection,
+      tokenRegexp: widget.tokenRegexp,
+      fullWidthRegexp: widget.fullWidthRegexp,
+    );
     final composer = Composer(
       selection: textEditingValue.selection.start,
       onDetectionTyped: widget.onDetectionTyped,
@@ -203,7 +215,13 @@ class DetectableEditableTextState extends EditableTextState {
 
   @override
   TextSpan buildTextSpan() {
-    final detections = detector.getDetections(textEditingValue.text, widget.acceptedDetections, textEditingValue.selection);
+    final detections = detector.getDetections(
+      copiedText: textEditingValue.text,
+      acceptedDetections: widget.acceptedDetections,
+      selection: textEditingValue.selection,
+      tokenRegexp: widget.tokenRegexp,
+      fullWidthRegexp: widget.fullWidthRegexp,
+    );
     final composer = Composer(
       selection: textEditingValue.selection.start,
       onDetectionTyped: widget.onDetectionTyped,

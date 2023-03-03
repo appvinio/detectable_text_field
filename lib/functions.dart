@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'detector/detector.dart';
 
 /// Check if the text has detection
-bool isDetected(String value, RegExp detectionRegExp, List<String>? acceptedDetections, bool isInProgress) {
+bool isDetected(
+    String value, RegExp detectionRegExp, List<String>? acceptedDetections, bool isInProgress) {
   final decoratedTextColor = Colors.blue;
   final detector = Detector(
     textStyle: TextStyle(),
@@ -13,25 +14,37 @@ bool isDetected(String value, RegExp detectionRegExp, List<String>? acceptedDete
     ),
     detectionRegExp: detectionRegExp,
   );
-  final result = detector.getDetections(value, acceptedDetections, null);
-  final detections = result
-      .where((detection) => detection.style!.color == decoratedTextColor)
-      .toList();
+  final result = detector.getDetections(
+    copiedText: value,
+    acceptedDetections: acceptedDetections,
+    selection: null,
+    tokenRegexp: null,
+    fullWidthRegexp: null,
+  );
+
+  final detections =
+      result.where((detection) => detection.style!.color == decoratedTextColor).toList();
   return detections.isNotEmpty;
 }
 
 /// Extract detections from the text
-List<String> extractDetections(String value, RegExp detectionRegExp, List<String>? acceptedDetections, bool isInProgress) {
+List<String> extractDetections(
+    String value, RegExp detectionRegExp, List<String>? acceptedDetections, bool isInProgress) {
   final decoratedTextColor = Colors.blue;
   final decorator = Detector(
     textStyle: TextStyle(),
     detectedStyle: TextStyle(color: decoratedTextColor),
     detectionRegExp: detectionRegExp,
   );
-  final decorations = decorator.getDetections(value, acceptedDetections, null );
-  final taggedDecorations = decorations
-      .where((decoration) => decoration.style!.color == decoratedTextColor)
-      .toList();
+  final decorations = decorator.getDetections(
+    copiedText: value,
+    acceptedDetections: acceptedDetections,
+    selection: null,
+    tokenRegexp: null,
+    fullWidthRegexp: null,
+  );
+  final taggedDecorations =
+      decorations.where((decoration) => decoration.style!.color == decoratedTextColor).toList();
   final result = taggedDecorations.map((decoration) {
     final text = decoration.range.textInside(value);
     return text.trim();
@@ -56,7 +69,13 @@ TextSpan getDetectedTextSpan({
     detectedStyle: decoratedStyle,
     textStyle: basicStyle,
     detectionRegExp: detectionRegExp,
-  ).getDetections(source, acceptedDetections,  null );
+  ).getDetections(
+    copiedText: source,
+    acceptedDetections: acceptedDetections,
+    selection: null,
+    tokenRegexp: null,
+    fullWidthRegexp: null,
+  );
   if (detections.isEmpty) {
     return TextSpan(text: source, style: basicStyle);
   } else {
@@ -89,22 +108,28 @@ TextSpan getDetectedTextSpan({
   }
 }
 
-TextSpan getDetectedTextSpanWithExtraChild(
-    {required TextStyle decoratedStyle,
-    required TextStyle basicStyle,
-    required String source,
-    required RegExp detectionRegExp,
-    Function(String)? onTap,
-    bool decorateAtSign = false,
-      bool alwaysDetectTap = false,
-    List<InlineSpan>? children,
-    required  List<String>? acceptedDetections,
-    }) {
+TextSpan getDetectedTextSpanWithExtraChild({
+  required TextStyle decoratedStyle,
+  required TextStyle basicStyle,
+  required String source,
+  required RegExp detectionRegExp,
+  Function(String)? onTap,
+  bool decorateAtSign = false,
+  bool alwaysDetectTap = false,
+  List<InlineSpan>? children,
+  required List<String>? acceptedDetections,
+}) {
   final detections = Detector(
     detectedStyle: decoratedStyle,
     textStyle: basicStyle,
     detectionRegExp: detectionRegExp,
-  ).getDetections(source,acceptedDetections, null);
+  ).getDetections(
+    copiedText: source,
+    acceptedDetections: acceptedDetections,
+    selection: null,
+    tokenRegexp: null,
+    fullWidthRegexp: null,
+  );
   if (detections.isEmpty) {
     // return TextSpan(text: source, style: basicStyle);
     return TextSpan(

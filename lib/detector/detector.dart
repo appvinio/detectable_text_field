@@ -124,14 +124,21 @@ class Detector {
   }
 
   /// Return the list of decorations with tagged and untagged text
-  List<Detection> getDetections(
-      String copiedText, List<String>? acceptedDetections, TextSelection? selection) {
+  List<Detection> getDetections({
+    required String copiedText,
+    required List<String>? acceptedDetections,
+    required TextSelection? selection,
+    required RegExp? fullWidthRegexp,
+    required RegExp? tokenRegexp,
+  }) {
     /// Text to change emoji into replacement text
-    final fullWidthRegExp = RegExp(
-        r'(u0022|u0027|\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])');
+    final fullWidthRegExp = fullWidthRegexp ??
+        RegExp(
+            r'(u0022|u0027|\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])');
 
     final fullWidthRegExpMatches = fullWidthRegExp.allMatches(copiedText).toList();
-    final tokenRegExp = RegExp(r'[€•ぁ-んーァ-ヶ一-龥\u1100-\u11FF\uAC00-\uD7A3０-９ａ-ｚＡ-Ｚ　]');
+    final tokenRegExp =
+        tokenRegexp ?? RegExp(r'[€•ぁ-んーァ-ヶ一-龥\u1100-\u11FF\uAC00-\uD7A3０-９ａ-ｚＡ-Ｚ　]');
     final emojiMatches = fullWidthRegExpMatches
         .where((match) => (!tokenRegExp.hasMatch(copiedText.substring(match.start, match.end))))
         .toList();
