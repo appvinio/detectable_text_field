@@ -20,7 +20,6 @@ export 'package:flutter/services.dart'
 typedef InputCounterWidgetBuilder = Widget? Function(
   /// The build context for the TextField.
   BuildContext context, {
-
   /// The length of the string currently in the input.
   required int currentLength,
 
@@ -79,7 +78,7 @@ class _TextFieldSelectionGestureDetectorBuilder extends TextSelectionGestureDete
   }
 
   @override
-  void onSingleTapUp(TapUpDetails details) {
+  void onSingleTapUp(TapDragUpDetails details) {
     editableText.hideToolbar();
     if (delegate.selectionEnabled) {
       switch (Theme.of(_state.context).platform) {
